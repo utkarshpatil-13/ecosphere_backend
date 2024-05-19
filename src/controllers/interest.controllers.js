@@ -2,13 +2,14 @@ import Interest from "../models/interests.models.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { ApiError } from "../utils/ApiError.js";
 
 const addData = asyncHandler(async (req, res) => {
     let interestPhotoUrl = '';
 
     if (req.files && req.files.photo) {
         const interestPhotoLocalPath = req.files.photo[0].path;
-        
+
         const interestPhoto = await uploadOnCloudinary(interestPhotoLocalPath);
 
         if (!interestPhoto) {
@@ -29,4 +30,16 @@ const addData = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, data, "Data Inserted successfully"));
 });
 
-export {addData};
+const getInterests = asyncHandler(async(req, res) => {
+    const interests = await Interest.find();
+
+    if(!interests){
+        throw new ApiError(404, "No interests found");
+    }
+
+    res
+    .status(200)
+    .json(new ApiResponse(200, interests, "All Interests"));
+});
+
+export {addData, getInterests};

@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { upload } from "../middlewares/multer.middlwares.js";
-import { addData } from "../controllers/interest.controllers.js";
+import { addData, getInterests } from "../controllers/interest.controllers.js";
 
 const router = Router();
 
@@ -12,5 +12,6 @@ router.post('/interests', upload.fields(
         }
     ]
 ), addData);
+router.get('/interests', getInterests);
 
 export {router as interestRouter};
