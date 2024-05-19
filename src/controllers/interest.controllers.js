@@ -6,9 +6,9 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 const addData = asyncHandler(async (req, res) => {
     let interestPhotoUrl = '';
 
-    if (req.file) {
-        const interestPhotoLocalPath = req.file.path;
-
+    if (req.files && req.files.photo) {
+        const interestPhotoLocalPath = req.files.photo[0].path;
+        
         const interestPhoto = await uploadOnCloudinary(interestPhotoLocalPath);
 
         if (!interestPhoto) {
