@@ -1,6 +1,6 @@
 import Interest from "../models/interests.models.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
-import { uploadOnCloudinary } from "../utils/Cloudinary.js";
+import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
 const addData = asyncHandler(async (req, res) => {
