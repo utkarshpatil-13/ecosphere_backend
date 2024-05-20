@@ -5,7 +5,7 @@ import { ApiError } from "../utils/ApiError.js";
 export const verifyJwt = async(req, res, next) => {
     try{
         const token = req.headers['authorization'].replace('Bearer ', '');
-
+        
         if(!token){
             return new ApiError(401, 'Unathorized request');
         }
@@ -19,6 +19,7 @@ export const verifyJwt = async(req, res, next) => {
         }
 
         req.user = user;
+        console.log(req.user);
 
         next();
     } 

@@ -78,20 +78,20 @@ const getInitiative = asyncHandler(async(req, res) => {
 });
 
 
-// const getInitiativesByCreator = asyncHandler(async(req, res) => {
+const getInitiativesByCreator = asyncHandler(async(req, res) => {
 
-//     const {userId} = req.user;
+    const user = req.user;
 
-//     const initiatives = await Initiative.find({userId});
+    const initiatives = await Initiative.find({creator: user._id});
 
-//     if(!initiatives){
-//         return new ApiError(401, "No Initiatives found!");
-//     }
+    if(!initiatives){
+        throw new ApiError(401, "No Initiatives found!");
+    }
 
-//     res
-//     .status(200)
-//     .json(new ApiResponse(200, initiatives, "All Initiatives"));
-// });
+    res
+    .status(200)
+    .json(new ApiResponse(200, initiatives, "All Initiatives"));
+});
 
 
 const updateInitiative = asyncHandler(async(req, res) => {
@@ -156,4 +156,4 @@ const joinInitiative = asyncHandler(async(req, res) => {
     .json(200, new ApiResponse(200, initiative, `${user._id} joined ${initiative.name}`));
 });
 
-export {createInitiative, getInitiatives, getInitiative, updateInitiative, deleteInitiative, joinInitiative};
+export {createInitiative, getInitiatives, getInitiative, updateInitiative, deleteInitiative, joinInitiative, getInitiativesByCreator};

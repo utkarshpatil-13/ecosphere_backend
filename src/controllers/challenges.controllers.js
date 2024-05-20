@@ -5,7 +5,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
 const createChallenge = asyncHandler(async(req, res) => {
-    const {title, description, startDate, endDate, category} = req.body;
+    const {title, description, startDate, endDate} = req.body;
 
     if([title, description, startDate, endDate].some((field) => field.trim() === '')){
         return new ApiError(400, "All fields are required!");
@@ -18,7 +18,7 @@ const createChallenge = asyncHandler(async(req, res) => {
     );
 
     if(existingChallenge){
-        return new ApiError(401, "Challenge already exists");
+        throw new ApiError(409, "Challenge already exists");
     }
 
     let challengePhotosUrls = [];
@@ -28,24 +28,21 @@ const createChallenge = asyncHandler(async(req, res) => {
         const challengePhotos = await Promise.all(challengePhotosLocalPaths.map(uploadOnCloudinary));
 
         if (challengePhotos.length < 1) {
-            return new ApiError(400, "Challenge photos not added");
+            throw new ApiError(400, "Initiative photos not added");
         }
 
         challengePhotosUrls = challengePhotos.map(photo => photo.secure_url);
     }
 
-    const createdChallenge = await Challenge.create({
-        title,
-        description,
-        startDate, 
-        endDate, 
-        ...(category && {category}),
-        ...(challengePhotosUrls.length > 0 && {images: challengePhotosUrls}),
-        creator: req.user._id
-    })
+    if(challengePhotosUrls.length > 0){
+        req.body.images = challengePhotosUrls;
+    }
+    req.body.creator = req.user._id;
+
+    const createdChallenge = await Challenge.create(req.body);
 
     if(!createdChallenge){
-        return new ApiError(401, "Something went wrong while creating your challenge!");
+        throw new ApiError(500, "Something went wrong while creating your challenge!");
     }
 
     res
@@ -81,20 +78,25 @@ const getChallenge = asyncHandler(async(req, res) => {
 });
 
 
-// const getChallengesByCreator = asyncHandler(async(req, res) => {
+const getChallengesByCreator = asyncHandler(async(req, res) => {
 
-//     const {userId} = req.user;
+    const user = req.user;
+    console.log(req.user);
 
-//     const challenges = await Challenge.find({userId});
+    if (!user) {
+        return res.status(400).json({ error: 'User information is missing or invalid.' });
+    }
 
-//     if(!challenges){
-//         return new ApiError(401, "No Challenges found!");
-//     }
+    const challenges = await Challenge.find({creator: user._id});
 
-//     res
-//     .status(200)
-//     .json(new ApiResponse(200, challenges, "All Challenges"));
-// });
+    if(!challenges){
+        throw new ApiError(401, "No Challenges found!");
+    }
+
+    res
+    .status(200)
+    .json(new ApiResponse(200, challenges, "All Challenges"));
+});
 
 
 const updateChallenge = asyncHandler(async(req, res) => {
@@ -153,10 +155,13 @@ const joinChallenge = asyncHandler(async(req, res) => {
         challenge.participants.push(user._id);
         await challenge.save();
     }
+    else{
+        throw new ApiError(401, "Already participated the challenge");
+    }
 
     res
     .status(200)
-    .json(200, new ApiResponse(200, challenge, `${user.name} joined ${challenge.title}`));
+    .json(new ApiResponse(200, challenge, `${user.name} joined ${challenge.title}`));
 });
 
-export {createChallenge, getChallenges, getChallenge, updateChallenge, deleteChallenge, joinChallenge};
+export {createChallenge, getChallenges, getChallenge, updateChallenge, deleteChallenge, joinChallenge, getChallengesByCreator};

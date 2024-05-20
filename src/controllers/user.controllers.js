@@ -104,18 +104,7 @@ const getUser = asyncHandler(async(req, res) => {
 
 const updateUser = asyncHandler(async(req, res) => {
     const user = req.user;
-
-    // const {name, email, password, location, interests} = req.body;
-
-    // const updateUserPayload = {
-    //     name,
-    //     email,
-    //     password,
-    //     ...(location && { location }),
-    //     ...(profilePhoto && { profilePhoto }),
-    //     ...(interests && { interests }),
-    // };
-
+    
     const updatedUser = await User.findByIdAndUpdate(user._id, req.body, {new: true}).select('-password');
 
     if(!updatedUser){
