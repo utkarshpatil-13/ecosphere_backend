@@ -1,7 +1,4 @@
 
-### Backend README.md
-
-```markdown
 # EcoSphere Backend
 
 Welcome to EcoSphere! This is the backend repository for our environmental awareness and action platform.
@@ -23,7 +20,8 @@ npm install
 
 npm run dev
 
-7. The backend server should start, and you can access the API endpoints at http://localhost:5000.
+
+7. The backend server should start, and you can access the API endpoints at http://localhost:4000.
 
 ## Additional Scripts
 
@@ -32,4 +30,3 @@ npm run dev
 ## Dependencies
 
 The backend uses various dependencies for development and runtime. Make sure to check the `package.json` file for the complete list.
-
