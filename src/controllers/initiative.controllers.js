@@ -77,6 +77,31 @@ const getInitiative = asyncHandler(async(req, res) => {
     .json(new ApiResponse(200, initiative, `Single Initiative`));
 });
 
+const getInitiativesByIds = asyncHandler(async(req, res) => {
+
+    const {ids} = req.body;
+
+    console.log(ids);
+
+    if(!ids || !Array.isArray(ids) || ids.length === 0){
+        return res
+        .status(400)
+        .json(new ApiError(400, "Invalid of missing ids array in request body"));
+    }
+
+    const initiatives = await Initiative.find({_id : {$in: ids}});
+
+    if(!initiatives){
+        return res
+        .status(404)
+        .json(new ApiError(404, "Initiatives not found!"));
+    }
+
+    res
+    .status(200)
+    .json(new ApiResponse(200, initiatives, `Initiatives by Id`));
+});
+
 
 const getInitiativesByCreator = asyncHandler(async(req, res) => {
 
@@ -156,4 +181,4 @@ const joinInitiative = asyncHandler(async(req, res) => {
     .json(200, new ApiResponse(200, initiative, `${user._id} joined ${initiative.name}`));
 });
 
-export {createInitiative, getInitiatives, getInitiative, updateInitiative, deleteInitiative, joinInitiative, getInitiativesByCreator};
+export {createInitiative, getInitiatives, getInitiative, updateInitiative, deleteInitiative, joinInitiative, getInitiativesByCreator, getInitiativesByIds};

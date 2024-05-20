@@ -87,8 +87,6 @@ const login = asyncHandler(async (req, res, next) => {
 const logout = asyncHandler(async(req, res) => {
     const user = req.user;
 
-    console.log(user);
-
     return res
     .status(200)
     .json(new ApiResponse(200, {}, "User logged out successfully!"));
@@ -116,4 +114,35 @@ const updateUser = asyncHandler(async(req, res) => {
     .json(new ApiResponse(200, updatedUser, "User Updated Successfully!"));
 });
 
-export {register, login, logout, getUser, updateUser};
+const joinInitiative = asyncHandler(async (req, res) => {
+    const {id} = req.params;
+
+    const user = req.user;
+
+    if(!user.initiativesParticipated.includes(id)){
+        user.initiativesParticipated.push(id);
+        await user.save();
+    }
+    
+    res
+    .status(200)
+    .json(new ApiResponse(200, user, `${user._id} updated with initiative`));
+});
+
+const joinChallenge = asyncHandler(async (req, res) => {
+    const {id} = req.params;
+
+    const user = req.user;
+    console.log(user);
+
+    if(!user.challegesParticipated.includes(id)){
+        user.challegesParticipated.push(id);
+        await user.save();
+    }
+
+    res
+    .status(200)
+    .json(new ApiResponse(200, user, `${user._id} updated with challenge`));
+});
+
+export {register, login, logout, getUser, updateUser, joinChallenge, joinInitiative};

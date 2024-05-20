@@ -98,6 +98,29 @@ const getChallengesByCreator = asyncHandler(async(req, res) => {
     .json(new ApiResponse(200, challenges, "All Challenges"));
 });
 
+const getChallengesByIds = asyncHandler(async(req, res) => {
+
+    const {ids} = req.body;
+
+    if(!ids || !Array.isArray(ids) || ids.length === 0){
+        throw new ApiError(400, "Invalid of missing ids array in request body");
+    }
+
+    console.log(ids);
+
+    const challenges = await Challenge.find({_id : {$in: ids}});
+
+
+    if(!challenges){
+        return res
+        .status(404)
+        .json(new ApiError(404, "Challenges not found!"));
+    }
+
+    res
+    .status(200)
+    .json(new ApiResponse(200, challenges, `Challenges by Id`));
+});
 
 const updateChallenge = asyncHandler(async(req, res) => {
 
@@ -164,4 +187,4 @@ const joinChallenge = asyncHandler(async(req, res) => {
     .json(new ApiResponse(200, challenge, `${user.name} joined ${challenge.title}`));
 });
 
-export {createChallenge, getChallenges, getChallenge, updateChallenge, deleteChallenge, joinChallenge, getChallengesByCreator};
+export {createChallenge, getChallenges, getChallenge, updateChallenge, deleteChallenge, joinChallenge, getChallengesByCreator, getChallengesByIds};

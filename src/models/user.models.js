@@ -26,6 +26,23 @@ const UserSchema = mongoose.Schema({
         {
             type: String,
         },
+    ],
+    challengesParticipated: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Challenge'
+        }
+    ],
+    initiativesParticipated: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Initiative'
+        }
+    ],
+    rewards: [
+        {
+            type: String,
+        }
     ]
 });
 

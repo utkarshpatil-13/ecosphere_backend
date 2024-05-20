@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createInitiative, deleteInitiative, getInitiative, getInitiatives, getInitiativesByCreator, joinInitiative, updateInitiative } from "../controllers/initiative.controllers.js";
+import { createInitiative, deleteInitiative, getInitiative, getInitiatives, getInitiativesByCreator, getInitiativesByIds, joinInitiative, updateInitiative } from "../controllers/initiative.controllers.js";
 import { verifyJwt } from "../middlewares/user.middlewares.js";
 import { upload } from "../middlewares/multer.middlwares.js";
 
@@ -14,6 +14,7 @@ router.post('/initiatives', verifyJwt, upload.fields([
 router.get('/initiatives', getInitiatives);
 router.get('/initiatives/user', verifyJwt, getInitiativesByCreator);
 router.get('/initiatives/:id', getInitiative);
+router.post('/initiatives/ids', verifyJwt, getInitiativesByIds);
 router.put('/initiatives/:id', verifyJwt, upload.fields(
     [
         {
