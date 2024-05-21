@@ -135,8 +135,8 @@ const joinChallenge = asyncHandler(async (req, res) => {
     const user = req.user;
     console.log(user);
 
-    if(!user.challegesParticipated.includes(id)){
-        user.challegesParticipated.push(id);
+    if(!user.challengesParticipated.includes(id)){
+        user.challengesParticipated.push(id);
         await user.save();
     }
 
