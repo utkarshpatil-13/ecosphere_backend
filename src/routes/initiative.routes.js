@@ -2,6 +2,7 @@ import { Router } from "express";
 import { createInitiative, deleteInitiative, getInitiative, getInitiatives, getInitiativesByCreator, getInitiativesByIds, joinInitiative, updateInitiative } from "../controllers/initiative.controllers.js";
 import { verifyJwt } from "../middlewares/user.middlewares.js";
 import { upload } from "../middlewares/multer.middlwares.js";
+import { errorHandler } from "../middlewares/error.middlwares.js";
 
 const router = Router();
 
@@ -25,5 +26,8 @@ router.put('/initiatives/:id', verifyJwt, upload.fields(
 ), updateInitiative);
 router.delete('/initiatives/:id', verifyJwt, deleteInitiative);
 router.put('/initiatives/:id/join', verifyJwt, joinInitiative);
+
+// using middleware for handling error
+router.use(errorHandler);
 
 export {router as initiativesRouter};

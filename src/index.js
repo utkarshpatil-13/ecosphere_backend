@@ -7,6 +7,7 @@ import { initiativesRouter } from './routes/initiative.routes.js'
 import { challengesRouter } from './routes/challenge.routes.js'
 import { actionsRouter } from './routes/action.routes.js'
 import { interestRouter } from './routes/interest.routes.js'
+import { errorHandler } from './middlewares/error.middlwares.js'
 
 const app = express()
 
@@ -22,6 +23,7 @@ app.use(cors({
 app.use(express.json({limit: "10mb"}));
 app.use(express.urlencoded({extended: true, limit: "10mb"}));
 app.use(express.static('public'));
+app.use(errorHandler);
 
 
 // routes

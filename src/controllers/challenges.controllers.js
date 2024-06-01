@@ -8,7 +8,7 @@ const createChallenge = asyncHandler(async(req, res) => {
     const {title, description, startDate, endDate} = req.body;
 
     if([title, description, startDate, endDate].some((field) => field.trim() === '')){
-        return new ApiError(400, "All fields are required!");
+        throw new ApiError(400, "All fields are required!");
     }
 
     const existingChallenge = await Challenge.findOne(
@@ -54,7 +54,7 @@ const getChallenges = asyncHandler(async(req, res) => {
     const challenges = await Challenge.find();
 
     if(!challenges){
-        return new ApiError(401, "No Challenges found!");
+        throw new ApiError(401, "No Challenges found!");
     }
 
     res
@@ -69,7 +69,7 @@ const getChallenge = asyncHandler(async(req, res) => {
     const challenge = await Challenge.findById(id);
 
     if(!challenge){
-        return new ApiError(401, "No Challenges found!");
+        throw new ApiError(401, "No Challenges found!");
     }
 
     res
@@ -84,7 +84,7 @@ const getChallengesByCreator = asyncHandler(async(req, res) => {
     console.log(req.user);
 
     if (!user) {
-        return res.status(400).json({ error: 'User information is missing or invalid.' });
+        throw new ApiError(400, 'User information is missing or invalid.');
     }
 
     const challenges = await Challenge.find({creator: user._id});
@@ -112,9 +112,7 @@ const getChallengesByIds = asyncHandler(async(req, res) => {
 
 
     if(!challenges){
-        return res
-        .status(404)
-        .json(new ApiError(404, "Challenges not found!"));
+        throw new ApiError(404, "Challenges not found!");
     }
 
     res
@@ -133,7 +131,7 @@ const updateChallenge = asyncHandler(async(req, res) => {
         const challengePhotos = await Promise.all(challengePhotosLocalPaths.map(uploadOnCloudinary));
 
         if (challengePhotos.length < 1) {
-            return new ApiError(400, "Challenge photos not added");
+            throw new ApiError(400, "Challenge photos not added");
         }
 
         challengePhotosUrls = challengePhotos.map(photo => photo.secure_url);
@@ -146,7 +144,7 @@ const updateChallenge = asyncHandler(async(req, res) => {
     const updatedChallenge = await Challenge.findByIdAndUpdate(id, req.body, {new: true});
 
     if(!updatedChallenge){
-        return new ApiError(401, "Updates not applied for your Challenge");
+        throw new ApiError(401, "Updates not applied for your Challenge");
     }
 
     res

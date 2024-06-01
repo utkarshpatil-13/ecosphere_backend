@@ -7,13 +7,13 @@ const register = asyncHandler(async (req, res, next) => {
     const { name, email, password } = req.body;
 
     if ([name, email, password].some(field => !field || field.trim() === '')) {
-        return new ApiError(400, "All fields are required!");
+        throw new ApiError(400, "All fields are required!");
     }
 
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
-        return new ApiError(409, "User already exists"); // 409 for conflict
+        throw new ApiError(409, "User already exists"); // 409 for conflict
     }
 
     console.log(req.body);
@@ -22,13 +22,13 @@ const register = asyncHandler(async (req, res, next) => {
     console.log(createdUser);
 
     if (!createdUser) {
-        return new ApiError(500, "Something went wrong while creating the user!");
+        throw new ApiError(500, "Something went wrong while creating the user!");
     }
 
     const user = await User.findById(createdUser._id).select('-password');
 
     if (!user) {
-        return new ApiError(500, "Something went wrong while retrieving the user!");
+        throw new ApiError(500, "Something went wrong while retrieving the user!");
     }
 
     return res.status(201).json(new ApiResponse(201, user, "User created successfully!")); // 201 for created
@@ -54,19 +54,19 @@ const login = asyncHandler(async (req, res, next) => {
 
     // Check if fields are not empty
     if ([email, password].some(field => !field || field.trim() === '')) {
-        return next(new ApiError(400, "All fields are required"));
+        throw new ApiError(400, "All fields are required");
     }
 
     const user = await User.findOne({ email });
     
     if (!user) {
-        return new ApiError(400, "User not found");
+        throw new ApiError(400, "User not found");
     }
 
     const isPasswordCorrect = await user.isPasswordCorrect(password);
 
     if (!isPasswordCorrect) {
-        return new ApiError(400, "Password is not correct");
+        throw new ApiError(400, "Password is not correct");
     }
 
     const accessToken = await generateAccessToken(user._id);
@@ -74,7 +74,7 @@ const login = asyncHandler(async (req, res, next) => {
     const loggedInUser = await User.findById(user._id).select('-password');
 
     if (!loggedInUser) {
-        return new ApiError(500, "Something went wrong while retrieving the user");
+        throw new ApiError(500, "Something went wrong while retrieving the user");
     }
 
     res.status(200).json(new ApiResponse(
@@ -106,7 +106,7 @@ const updateUser = asyncHandler(async(req, res) => {
     const updatedUser = await User.findByIdAndUpdate(user._id, req.body, {new: true}).select('-password');
 
     if(!updatedUser){
-        return new ApiError(401, "User profile unable to update");
+        throw new ApiError(401, "User profile unable to update");
     }
 
     res

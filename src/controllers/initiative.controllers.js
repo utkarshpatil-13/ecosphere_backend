@@ -8,7 +8,7 @@ const createInitiative = asyncHandler(async(req, res) => {
     const {title, description, date, location} = req.body;
 
     if([title, description, date, location].some((field) => field.trim() === '')){
-        return new ApiError(400, "All fields are required!");
+        throw new ApiError(400, "All fields are required!");
     }
 
     const existingInitiative = await Initiative.findOne(
@@ -18,7 +18,7 @@ const createInitiative = asyncHandler(async(req, res) => {
     );
 
     if(existingInitiative){
-        return new ApiError(409, "Initiative already exists");
+        throw new ApiError(409, "Initiative already exists");
     }
 
     let initiativePhotosUrls = [];
@@ -28,7 +28,7 @@ const createInitiative = asyncHandler(async(req, res) => {
         const initiativePhotos = await Promise.all(initiativePhotosLocalPaths.map(uploadOnCloudinary));
 
         if (initiativePhotos.length < 1) {
-            return new ApiError(400, "Initiative photos not added");
+            throw new ApiError(400, "Initiative photos not added");
         }
 
         initiativePhotosUrls = initiativePhotos.map(photo => photo.secure_url);
@@ -42,7 +42,7 @@ const createInitiative = asyncHandler(async(req, res) => {
     const createdInitiative = await Initiative.create(req.body);
 
     if(!createdInitiative){
-        return new ApiError(500, "Something went wrong while creating your initiative!");
+        throw new ApiError(500, "Something went wrong while creating your initiative!");
     }
 
     res
@@ -54,7 +54,7 @@ const getInitiatives = asyncHandler(async(req, res) => {
     const initiatives = await Initiative.find();
 
     if(!initiatives){
-        return new ApiError(401, "No Initiatives found!");
+        throw new ApiError(401, "No Initiatives found!");
     }
 
     res
@@ -69,7 +69,7 @@ const getInitiative = asyncHandler(async(req, res) => {
     const initiative = await Initiative.findById(id);
 
     if(!initiative){
-        return new ApiError(401, "No Initiatives found!");
+        throw new ApiError(401, "No Initiatives found!");
     }
 
     res
@@ -84,17 +84,13 @@ const getInitiativesByIds = asyncHandler(async(req, res) => {
     console.log(ids);
 
     if(!ids || !Array.isArray(ids) || ids.length === 0){
-        return res
-        .status(400)
-        .json(new ApiError(400, "Invalid of missing ids array in request body"));
+        throw new ApiError(400, "Invalid of missing ids array in request body");
     }
 
     const initiatives = await Initiative.find({_id : {$in: ids}});
 
     if(!initiatives){
-        return res
-        .status(404)
-        .json(new ApiError(404, "Initiatives not found!"));
+        throw new ApiError(404, "Initiatives not found!");
     }
 
     res
@@ -130,7 +126,7 @@ const updateInitiative = asyncHandler(async(req, res) => {
         const initiativePhotos = await Promise.all(initiativePhotosLocalPaths.map(uploadOnCloudinary));
 
         if (initiativePhotos.length < 1) {
-            return new ApiError(400, "Initiative photos not added");
+            throw new ApiError(400, "Initiative photos not added");
         }
 
         initiativePhotosUrls = initiativePhotos.map(photo => photo.secure_url);
@@ -143,7 +139,7 @@ const updateInitiative = asyncHandler(async(req, res) => {
     const updatedInitiative = await Initiative.findByIdAndUpdate(id, req.body, {new: true});
 
     if(!updatedInitiative){
-        return new ApiError(401, "Updates not applied for initiative");
+        throw new ApiError(401, "Updates not applied for initiative");
     }
 
     res
